@@ -1,0 +1,31 @@
+{
+  "manifest_version": 2,
+  "name": "FoxyFlag",
+  "version": "1.0.0",
+  "description": "Shows the hosting country flag for the current site in the Firefox address bar.",
+  "permissions": [
+    "dns",
+    "webNavigation",
+    "<all_urls>",
+    "http://ip-api.com/*"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "page_action": {
+    "default_title": "Resolving site location"
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "foxyflag@zeneka.org",
+      "strict_min_version": "109.0"
+    }
+  }
+}
