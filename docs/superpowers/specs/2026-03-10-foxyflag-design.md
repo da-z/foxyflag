@@ -14,14 +14,14 @@ Single background script WebExtension using Firefox's `pageAction` API.
 2. Extract hostname from URL
 3. Check in-memory cache for hostname → skip to step 6 if cached
 4. Resolve hostname to IP via `dns.resolve()` (Firefox WebExtension API)
-5. Query `http://ip-api.com/json/{ip}?fields=countryCode,country` for country data
+5. If the resolved IP is public, query `http://ip-api.com/json/{ip}?fields=countryCode,country` for country data
 6. Render flag emoji onto 16x16 / 32x32 canvas
 7. Set page action icon and tooltip (country name + IP)
 8. Show page action for the tab
 
 ### Error Flow
 
-- API failure / timeout / non-routable IP → show 🌐 globe icon, tooltip "Unknown country"
+- API failure / timeout / non-routable IP / unknown country → hide page action
 - Internal URLs (`about:`, `moz-extension:`, `file:`) → hide page action
 
 ## Components

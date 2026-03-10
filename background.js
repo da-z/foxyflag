@@ -23,10 +23,15 @@ browser.webNavigation.onCompleted.addListener(async ({ tabId, frameId, url }) =>
 
   try {
     const geo = await getGeoForHostname(parsedUrl.hostname);
+    if (!geo || geo.isFallback) {
+      hidePageAction(tabId);
+      return;
+    }
+
     await showGeoPageAction(tabId, geo);
   } catch (error) {
     console.error("FoxyFlag navigation handling failed", { url, error });
-    await showFallbackPageAction(tabId);
+    hidePageAction(tabId);
   }
 });
 
@@ -51,6 +56,17 @@ async function getGeoForHostname(hostname) {
   const cached = HOST_CACHE.get(hostname);
   if (cached) {
     return cached;
+  }
+
+  if (isLocalHostname(hostname)) {
+    const fallback = {
+      country: "Unknown country",
+      countryCode: null,
+      ip: "Unknown IP",
+      isFallback: true
+    };
+    HOST_CACHE.set(hostname, fallback);
+    return fallback;
   }
 
   const dnsResult = await browser.dns.resolve(hostname, ["disable_ipv6"]);
@@ -134,35 +150,11 @@ async function fetchGeo(ip) {
 }
 
 async function showGeoPageAction(tabId, geo) {
-  const title = geo.isFallback
-    ? "Unknown country"
-    : `${geo.country} (${geo.ip})`;
-
-  const icon = geo.countryCode
-    ? await getFlagIconData(geo.countryCode)
-    : {
-        16: browser.runtime.getURL("icons/globe-16.png"),
-        32: browser.runtime.getURL("icons/globe-32.png")
-      };
+  const title = `${geo.country} (${geo.ip})`;
+  const icon = await getFlagIconData(geo.countryCode);
 
   await browser.pageAction.setTitle({ tabId, title });
-  if (geo.countryCode) {
-    await browser.pageAction.setIcon({ tabId, imageData: icon });
-  } else {
-    await browser.pageAction.setIcon({ tabId, path: icon });
-  }
-  await browser.pageAction.show(tabId);
-}
-
-async function showFallbackPageAction(tabId) {
-  await browser.pageAction.setTitle({ tabId, title: "Unknown country" });
-  await browser.pageAction.setIcon({
-    tabId,
-    path: {
-      16: browser.runtime.getURL("icons/globe-16.png"),
-      32: browser.runtime.getURL("icons/globe-32.png")
-    }
-  });
+  await browser.pageAction.setIcon({ tabId, imageData: icon });
   await browser.pageAction.show(tabId);
 }
 
@@ -227,6 +219,11 @@ function drawEmojiFlag(context, emoji, size) {
 
 function isIpAddress(value) {
   return /^(?:\d{1,3}\.){3}\d{1,3}$/.test(value) || value.includes(":");
+}
+
+function isLocalHostname(hostname) {
+  const normalized = hostname.toLowerCase();
+  return normalized === "localhost" || normalized.endsWith(".localhost");
 }
 
 function isNonRoutableIp(ip) {

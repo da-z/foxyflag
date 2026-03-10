@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "FoxyFlag",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shows the hosting country flag for the current site in the Firefox address bar.",
   "permissions": [
     "dns",
