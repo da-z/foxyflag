@@ -4,7 +4,7 @@ A Firefox extension that shows the country flag of the website you're browsing i
 
 ## Install
 
-[Download the signed .xpi](https://addons.mozilla.org/firefox/downloads/file/4720737/020a75c0eeb445f79a64-1.0.0.xpi) and open it in Firefox.
+[Download the signed .xpi](foxyflag-signed.xpi) and open it in Firefox.
 
 ## How it works
 
@@ -28,4 +28,4 @@ If the country can't be determined, a globe icon is shown instead.
 ./rebuild-xpi.sh
 ```
 
-Produces `foxyflag.xpi` in the project root.
+Produces `foxyflag.xpi` in the project root (you have to submit it to ).
